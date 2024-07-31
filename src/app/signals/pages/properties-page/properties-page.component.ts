@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, effect, signal } from '@angular/core';
 import { JsonPipe } from '@angular/common';
 
 import { User } from '../../interfaces/user-request.interface';
@@ -11,6 +11,7 @@ import { User } from '../../interfaces/user-request.interface';
   styles: ``,
 })
 export default class PropertiesPageComponent {
+  public counter = signal<number>(10);
   public user = signal<User>({
     id: 2,
     email: 'janet.weaver@reqres.in',
@@ -18,6 +19,24 @@ export default class PropertiesPageComponent {
     last_name: 'Weaver',
     avatar: 'https://reqres.in/img/faces/2-image.jpg',
   });
+
+  /**
+   * La primera vez, siempre se ejecuta el effect(), luego
+   * se ejecutará cada vez que cambie alguna señal que está siendo
+   * referenciada en su interior.
+   *
+   * El effect() tiene una limpieza automática, no necesitamos
+   * "desuscribirnos", o algo así, tal como lo hacíamos con los
+   * subjects.
+   */
+  public userChangeEffect = effect(() => {
+    console.log('disparando el userChangeEffect');
+    console.log(this.counter());
+  });
+
+  public increaseBy(value: number) {
+    this.counter.update((currentValue) => currentValue + 1);
+  }
 
   public onFieldUpdated(field: keyof User, value: string) {
     // this.user.set({ ...this.user(), [field]: value });
