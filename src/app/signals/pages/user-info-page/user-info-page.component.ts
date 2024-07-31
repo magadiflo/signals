@@ -12,9 +12,14 @@ import { User } from '../../interfaces/user-request.interface';
 })
 export default class UserInfoPageComponent implements OnInit {
   private usersService = inject(UsersService);
+
   public userId = signal<number>(1);
   public currentUser = signal<User | undefined>(undefined);
-  public userWasFound = signal<boolean>(true);
+  public fullName = computed<string>(() =>
+    this.currentUser()
+      ? this.currentUser()!.first_name + this.currentUser()!.last_name
+      : ''
+  );
 
   ngOnInit(): void {
     this.loadUser(this.userId());
@@ -23,6 +28,7 @@ export default class UserInfoPageComponent implements OnInit {
   public loadUser(id: number): void {
     if (id <= 0) return;
 
+    this.currentUser.set(undefined);
     this.userId.set(id);
 
     this.usersService
